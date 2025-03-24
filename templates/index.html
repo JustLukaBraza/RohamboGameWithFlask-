@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            margin: 2rem auto;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 2rem;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-weight: 800;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+            to { text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            gap: 1rem;
+        }
+
+        .score-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            min-width: 150px;
+            transition: transform 0.3s ease;
+        }
+
+        .score-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .score-box.winning {
+            background: rgba(76, 175, 80, 0.2);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .choices {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .choice-button {
+            padding: 1.5rem 2.5rem;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 180px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .choice-button:hover::before {
+            left: 100%;
+        }
+
+        .choice-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .choice-button:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .choice-button.selected {
+            background: rgba(76, 175, 80, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .choice-display {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .choice-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+
+        .choice-box.winning {
+            background: rgba(76, 175, 80, 0.2);
+            transform: scale(1.05);
+        }
+
+        #result {
+            font-size: 2.5rem;
+            margin: 1.5rem 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            min-height: 60px;
+        }
+
+        .reset-button {
+            background: rgba(255, 59, 48, 0.2);
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 59, 48, 0.3);
+            transform: scale(1.05);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            min-width: 120px;
+        }
+
+        .win-streak {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .lose-streak {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .sound-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .leaderboard-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .leaderboard-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .leaderboard-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .leaderboard-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .leaderboard-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .name-input-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .name-input-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .name-input {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2rem;
+            width: 100%;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .name-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .close-button:hover {
+            transform: scale(1.1);
+        }
+
+        .player-name {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+        }
+
+        .achievement-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+            z-index: 100;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-title {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .achievement-description {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .rules-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+        }
+
+        .rules-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .rules-list {
+            text-align: left;
+            margin: 2rem 0;
+            padding: 0 1rem;
+        }
+
+        .rules-list li {
+            margin: 1rem 0;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .rules-list li::before {
+            content: '🎮';
+            margin-right: 0.5rem;
+        }
+
+        .rules-title {
+            color: #FFD700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .rules-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .rules-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .rules-close:hover {
+            transform: scale(1.1);
+        }
+
+        .rules-button {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .rules-button:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .choice-button {
+                min-width: 140px;
+                padding: 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <button class="leaderboard-button" onclick="showLeaderboard()">🏆</button>
+    <button class="sound-toggle" onclick="toggleSound()">🔊</button>
+    <div class="player-name" id="player-name-display"></div>
+    
+    <div class="container">
+        <h1>Rock Paper Scissors</h1>
+        <div class="score-container">
+            <div class="score-box" id="player-score-box">
+                <div>Player</div>
+                <div class="score" id="player-score">0</div>
+            </div>
+            <div class="score-box" id="computer-score-box">
+                <div>Computer</div>
+                <div class="score" id="computer-score">0</div>
+            </div>
+        </div>
+        <div class="choices">
+            <button class="choice-button" onclick="play('rock')">🪨 Rock</button>
+            <button class="choice-button" onclick="play('paper')">📄 Paper</button>
+            <button class="choice-button" onclick="play('scissors')">✂️ Scissors</button>
+        </div>
+        <div class="choice-display">
+            <div class="choice-box" id="player-choice-box">
+                <div>Your Choice</div>
+                <div id="player-choice-display">-</div>
+            </div>
+            <div class="choice-box" id="computer-choice-box">
+                <div>Computer's Choice</div>
+                <div id="computer-choice-display">-</div>
+            </div>
+        </div>
+        <div id="result" class="fade-in"></div>
+        <div class="stats-container">
+            <div class="stat-box">
+                <div>Win Streak</div>
+                <div class="win-streak" id="win-streak">0</div>
+            </div>
+            <div class="stat-box">
+                <div>Lose Streak</div>
+                <div class="lose-streak" id="lose-streak">0</div>
+            </div>
+            <div class="stat-box">
+                <div>Total Games</div>
+                <div id="total-games">0</div>
+            </div>
+        </div>
+        <button class="reset-button" onclick="resetGame()">Reset Game</button>
+    </div>
+
+    <div class="modal" id="game-over-modal">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p id="game-over-message"></p>
+            <button class="choice-button" onclick="closeModal()">Play Again</button>
+        </div>
+    </div>
+
+    <div class="leaderboard-modal" id="leaderboard-modal">
+        <div class="leaderboard-content">
+            <button class="close-button" onclick="closeLeaderboard()">×</button>
+            <h2>Leaderboard</h2>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Wins</th>
+                        <th>Win Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="name-input-modal" id="name-input-modal">
+        <div class="name-input-content">
+            <h2>Welcome to Rock Paper Scissors!</h2>
+            <p>Please enter your name to start playing:</p>
+            <input type="text" class="name-input" id="player-name-input" placeholder="Enter your name" maxlength="20">
+            <button class="choice-button" onclick="startGame()">Start Playing</button>
+        </div>
+    </div>
+
+    <div class="achievement-badge" id="achievement-badge">
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-title"></div>
+        <div class="achievement-description"></div>
+    </div>
+
+    <div class="rules-modal" id="rules-modal">
+        <div class="rules-content">
+            <button class="rules-close" onclick="closeRules()">×</button>
+            <h2 class="rules-title">Game Rules</h2>
+            <p class="rules-subtitle">Master the art of Rock Paper Scissors!</p>
+            <ul class="rules-list">
+                <li>Choose between Rock (🪨), Paper (📄), or Scissors (✂️)</li>
+                <li>Rock beats Scissors, Scissors beats Paper, Paper beats Rock</li>
+                <li>First player to reach 5 wins becomes the champion!</li>
+                <li>Track your win streaks and achievements</li>
+                <li>Compete with other players on the global leaderboard</li>
+                <li>Sound effects can be toggled with the 🔊 button</li>
+                <li>View the leaderboard anytime with the 🏆 button</li>
+                <li>Good luck and have fun!</li>
+            </ul>
+            <button class="rules-button" onclick="closeRules()">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        let playerScore = 0;
+        let computerScore = 0;
+        let winStreak = 0;
+        let loseStreak = 0;
+        let totalGames = 0;
+        let soundEnabled = true;
+        let lastResult = '';
+        let playerName = '';
+        let achievements = {
+            firstWin: false,
+            winStreak3: false,
+            winStreak5: false,
+            perfectGame: false
+        };
+
+        const sounds = {
+            win: new Audio('https://assets.mixkit.co/active_storage/sfx/1434/1434-preview.mp3'),
+            lose: new Audio('https://assets.mixkit.co/active_storage/sfx/1433/1433-preview.mp3'),
+            tie: new Audio('https://assets.mixkit.co/active_storage/sfx/1432/1432-preview.mp3'),
+            click: new Audio('https://assets.mixkit.co/active_storage/sfx/1431/1431-preview.mp3')
+        };
+
+        function playSound(type) {
+            if (soundEnabled && sounds[type]) {
+                sounds[type].currentTime = 0;
+                sounds[type].play();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.querySelector('.sound-toggle').textContent = soundEnabled ? '🔊' : '🔈';
+        }
+
+        function updateScore(result) {
+            if (result === "You win!") {
+                playerScore++;
+                winStreak++;
+                loseStreak = 0;
+                document.getElementById('player-score').textContent = playerScore;
+                document.getElementById('win-streak').textContent = winStreak;
+                document.getElementById('player-score-box').classList.add('winning');
+                setTimeout(() => {
+                    document.getElementById('player-score-box').classList.remove('winning');
+                }, 1000);
+                playSound('win');
+            } else if (result === "Computer wins!") {
+                computerScore++;
+                loseStreak++;
+                winStreak = 0;
+                document.getElementById('computer-score').textContent = computerScore;
+                document.getElementById('lose-streak').textContent = loseStreak;
+                document.getElementById('computer-score-box').classList.add('winning');
+                setTimeout(() => {
+                    document.getElementById('computer-score-box').classList.remove('winning');
+                }, 1000);
+                playSound('lose');
+            } else {
+                playSound('tie');
+            }
+            totalGames++;
+            document.getElementById('total-games').textContent = totalGames;
+            updateLeaderboard(result);
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            winStreak = 0;
+            loseStreak = 0;
+            totalGames = 0;
+            document.getElementById('player-score').textContent = '0';
+            document.getElementById('computer-score').textContent = '0';
+            document.getElementById('win-streak').textContent = '0';
+            document.getElementById('lose-streak').textContent = '0';
+            document.getElementById('total-games').textContent = '0';
+            document.getElementById('result').textContent = '';
+            document.getElementById('player-choice-display').textContent = '-';
+            document.getElementById('computer-choice-display').textContent = '-';
+            achievements = {
+                firstWin: false,
+                winStreak3: false,
+                winStreak5: false,
+                perfectGame: false
+            };
+        }
+
+        function showGameOverModal() {
+            const modal = document.getElementById('game-over-modal');
+            const message = document.getElementById('game-over-message');
+            message.textContent = `Final Score: ${playerScore} - ${computerScore}`;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('game-over-modal').style.display = 'none';
+            resetGame();
+        }
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '2px';
+                particle.style.height = '2px';
+                particle.style.background = 'rgba(255, 255, 255, 0.5)';
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `float ${Math.random() * 10 + 5}s infinite linear`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function play(choice) {
+            playSound('click');
+            const buttons = document.querySelectorAll('.choice-button');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+
+            const resultElement = document.getElementById('result');
+            resultElement.classList.remove('fade-in');
+            
+            fetch('/play', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ choice: choice })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('player-choice-display').textContent = choice;
+                document.getElementById('computer-choice-display').textContent = data.computer_choice;
+                resultElement.textContent = data.result;
+                resultElement.classList.add('fade-in');
+                updateScore(data.result);
+                lastResult = data.result;
+
+                if (playerScore >= 5 || computerScore >= 5) {
+                    setTimeout(showGameOverModal, 1000);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Show name input modal on page load
+        window.onload = function() {
+            document.getElementById('name-input-modal').style.display = 'flex';
+        }
+
+        function startGame() {
+            const nameInput = document.getElementById('player-name-input');
+            playerName = nameInput.value.trim();
+            
+            if (playerName) {
+                document.getElementById('name-input-modal').style.display = 'none';
+                document.getElementById('player-name-display').textContent = `Player: ${playerName}`;
+                showRules();
+                loadLeaderboard();
+            } else {
+                alert('Please enter your name to continue!');
+            }
+        }
+
+        function showRules() {
+            document.getElementById('rules-modal').style.display = 'flex';
+        }
+
+        function closeRules() {
+            document.getElementById('rules-modal').style.display = 'none';
+        }
+
+        function showLeaderboard() {
+            document.getElementById('leaderboard-modal').style.display = 'flex';
+            loadLeaderboard();
+        }
+
+        function closeLeaderboard() {
+            document.getElementById('leaderboard-modal').style.display = 'none';
+        }
+
+        function loadLeaderboard() {
+            fetch('/leaderboard')
+                .then(response => response.json())
+                .then(players => {
+                    const leaderboardBody = document.getElementById('leaderboard-body');
+                    leaderboardBody.innerHTML = players.map((player, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${player.name}</td>
+                            <td>${player.wins}</td>
+                            <td>${((player.wins / player.totalGames) * 100).toFixed(1)}%</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(error => console.error('Error loading leaderboard:', error));
+        }
+
+        function updateLeaderboard(result) {
+            const players = JSON.parse(localStorage.getItem('rpsLeaderboard') || '[]');
+            let playerIndex = players.findIndex(p => p.name === playerName);
+            
+            if (playerIndex === -1) {
+                players.push({
+                    name: playerName,
+                    wins: 0,
+                    totalGames: 0
+                });
+                playerIndex = players.length - 1;
+            }
+            
+            players[playerIndex].totalGames++;
+            if (result === "You win!") {
+                players[playerIndex].wins++;
+            }
+            
+            localStorage.setItem('rpsLeaderboard', JSON.stringify(players));
+
+            // Update global leaderboard
+            fetch('/leaderboard', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: playerName,
+                    wins: result === "You win!" ? 1 : 0,
+                    totalGames: 1
+                })
+            })
+            .then(response => response.json())
+            .then(() => {
+                loadLeaderboard();
+                checkAchievements(players[playerIndex]);
+            })
+            .catch(error => console.error('Error updating leaderboard:', error));
+        }
+
+        function checkAchievements(player) {
+            const winRate = player.wins / player.totalGames;
+            
+            if (!achievements.firstWin && player.wins >= 1) {
+                showAchievement('First Victory', 'You won your first game!');
+                achievements.firstWin = true;
+            }
+            
+            if (!achievements.winStreak3 && winStreak >= 3) {
+                showAchievement('Hot Streak', 'You won 3 games in a row!');
+                achievements.winStreak3 = true;
+            }
+            
+            if (!achievements.winStreak5 && winStreak >= 5) {
+                showAchievement('Unstoppable', 'You won 5 games in a row!');
+                achievements.winStreak5 = true;
+            }
+            
+            if (!achievements.perfectGame && winRate === 1 && player.totalGames >= 5) {
+                showAchievement('Perfect Game', 'You won all games in this session!');
+                achievements.perfectGame = true;
+            }
+        }
+
+        function showAchievement(title, description) {
+            const badge = document.getElementById('achievement-badge');
+            badge.querySelector('.achievement-title').textContent = title;
+            badge.querySelector('.achievement-description').textContent = description;
+            badge.style.display = 'block';
+            
+            setTimeout(() => {
+                badge.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize particles
+        createParticles();
+
+        // Add floating animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0% { transform: translateY(0) translateX(0); }
+                50% { transform: translateY(-20px) translateX(10px); }
+                100% { transform: translateY(0) translateX(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html> 
