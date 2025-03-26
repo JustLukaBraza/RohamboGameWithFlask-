@@ -24,8 +24,8 @@ A modern, interactive web-based Rock Paper Scissors game built with Flask and Py
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/rock-paper-scissors.git
-cd rock-paper-scissors
+git clone https://github.com/JustLukaBraza/RohamboGameWithFlask-
+cd RohamboGameWithFlask-
 ```
 
 2. Install the required packages:
